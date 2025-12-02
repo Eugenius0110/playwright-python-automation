@@ -1,1 +1,1 @@
-# auto_tests
+# playwright-python-automation
