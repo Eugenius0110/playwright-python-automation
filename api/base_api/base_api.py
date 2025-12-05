@@ -13,16 +13,21 @@ class BaseApi:
     TEST_EMAIL_USER = f"{os.getenv('TEST_EMAIL_USER')}."
 
     def __init__(self, request_context: APIRequestContext):
-        #self.request =
+        self.request = request_context
         self.response = None
         self.model = None
 
     def print_response(self):
-        print(f"\n{self.response.json()}")
+        #if self.response:
+        print(f"\nStatus: {self.response.status}")
+        print(f"Headers: {dict(self.response.headers)}")
+        print(f"Body: {self.response.json()}")
+        #else:
+         #   self.response.text()
 
     def check_response_status_code(self, status_code: HTTPStatus):
-        assert self.response.status_code == status_code, f"Ожидался {status_code}, пришел {self.response.status_code}\n{self.response.json()}"
-        return self.response.status_code
+        assert self.response.status == status_code, f"Ожидался {status_code}, пришел {self.response.status}\n{self.response.json()}"
+        return self.response.status
 
     def check_model(self, model_class):
         self.model = model_class(**self.response.json())

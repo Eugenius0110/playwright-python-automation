@@ -4,10 +4,10 @@ import json
 from api.endpoints.auth import Auth
 #from api.endpoints.confirm_code import ConfirmCode
 #from api.endpoints.set_password import SetPassword
-from api.payloads.login_signup import SignUpPayload
-from api.payloads.login_signup import ConfirmCodePayload
-from api.payloads.login_signup import SetPasswordPayload
-import api.models.login_signup as models
+from api.payloads.auth_payload import SignUpPayload, LoginPayload
+from api.payloads.auth_payload import ConfirmCodePayload
+from api.payloads.auth_payload import SetPasswordPayload
+import api.models.auth_model as models
 from http import HTTPStatus
 
 
@@ -15,12 +15,25 @@ from http import HTTPStatus
         SignUpPayload.payload_signup_ok,
         HTTPStatus.OK,
         models.SignUpModel200)])
-def test_signup_user_201(payload, status_code, model):
-    signup_endpoint = Auth()
+def test_signup_user_200(api_request_context, payload, status_code, model):
+    signup_endpoint = Auth(api_request_context)
     signup_endpoint.signup_user(payload)
     signup_endpoint.check_response_status_code(status_code)
     signup_endpoint.check_model(model)
-    #signup_endpoint.delete_user()
+    signup_endpoint.delete_user()
+
+@pytest.mark.parametrize('payload, status_code, model', [(
+        LoginPayload.payload_user_admin_login_success,
+        HTTPStatus.OK,
+        models.LoginSuccess200)])
+@pytest.mark.api
+@pytest.mark.smoke
+def test_login_200(api_request_context, payload, status_code, model): # test_passed
+    login_endpoint = Auth(api_request_context)
+    login_endpoint.login_user_admin(payload)
+    login_endpoint.print_response()
+    login_endpoint.check_response_status_code(status_code)
+    login_endpoint.check_model(model)
 
 
 

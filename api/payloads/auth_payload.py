@@ -35,6 +35,33 @@ class SignUpPayload:
     #     "email": f"{os.getenv('TEST_EMAIL_USER')}"
     # }
 
+class LoginPayload:
+
+    payload_user_admin_login_success = {
+        "phoneNumberOrEmail": f"{os.getenv('ADMIN_EMAIL')}",
+        "password": f"{os.getenv('ADMIN_PASSWORD')}"
+    }
+
+    payload_create_suser_login_success = {
+        "email": f"{os.getenv('TEST_EMAIL_USER')}",
+        "password": f"{os.getenv('TEST_PASSWORD')}"
+    }
+
+    payload_email_not_exist = {
+        "email": f"{os.getenv('TEST_EMAIL_USER_2')}",
+        "password": f"{os.getenv('TEST_PASSWORD')}"
+    }
+
+    payload_password_incorrect = {
+        "email": f"{os.getenv('TEST_EMAIL_USER_2')}",
+        "password": f"{os.getenv('TEST_PASSWORD')}incorrect"
+    }
+
+    payload_email_empty = {
+        "email": f"",
+        "password": f"{os.getenv('TEST_PASSWORD')}"
+    }
+
 
 class ConfirmCodePayload:
 

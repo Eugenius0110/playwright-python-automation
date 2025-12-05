@@ -4,6 +4,7 @@ import email
 import time
 from email.policy import default
 from dotenv import load_dotenv
+import re
 
 load_dotenv()
 
@@ -39,11 +40,14 @@ class GetConfirmCode:
         msg = email.message_from_bytes(raw_email, policy=default)
         #subject, encoding = decode_header(msg["Subject"])[0] if msg["Subject"] else ("Без темы", None)
         email_body = msg.get_payload(decode=True).decode() # тело письма
-        print(email_body)
-        confirm_code = ''.join(filter(str.isdigit, email_body)) # оставляем только цифры
+        #print(email_body)
+        five_digit_pattern = r'\b(\d{5})\b'
+        match = re.search(five_digit_pattern, email_body)
+        if match:
+            confirm_code = match.group(1)
         print(f"\n ******************** \n Confirm code: {confirm_code} \n ********************")
         mail.close()
         mail.logout()
         return confirm_code
 
-GetConfirmCode.get_confirm_code_from_latest_email()
+#GetConfirmCode.get_confirm_code_from_latest_email()

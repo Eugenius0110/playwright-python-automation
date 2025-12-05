@@ -7,8 +7,7 @@ from api.base_api.base_api import BaseApi
 
 class Auth(BaseApi):
     def __init__(self, request_context: APIRequestContext):
-        self.request = request_context
-
+        super().__init__(request_context)
         self.header = {
             'Content-Type': 'application/json; charset=utf-8',
             'Accept': 'application/json; charset=utf-8'
@@ -20,18 +19,19 @@ class Auth(BaseApi):
         self.response = self.request.post(
             url=f"{self.BASE_URL}/api/auth/registration",
             headers=self.header,
-            json=payload
+            data=payload
         )
-        return self.response
+        return self.response.json()
 
-    def login(self, payload):
-        self.response = requests.post(
-            url=f"{self.BASE_URL}/api/auth/login/",
-            json=payload
+    def login_user_admin(self, payload):
+        self.response = self.request.post(
+            url=f"{self.BASE_URL}/api/auth/login",
+            data=payload
         )
-        if 'access_token' in self.response.json():
-           self.access_token = self.response.json()['access_token']
-           self.refresh_token = self.response.json()['refresh_token']
+        if 'accessToken' in self.response.json():
+           self.access_token = self.response.json()['accessToken']
+           self.refresh_token = self.response.json()['refreshToken']
+        return self.response.json()
 
     # def logout(self):
     #     payload_refresh_token = {
@@ -57,25 +57,22 @@ class Auth(BaseApi):
     #             }
     #         )
 
-    def assign_admin_self(self):
-        payload_refresh_token = {
-            "refresh_token": f"{self.refresh_token}"
-        }
-        self.response = requests.post(
-            url=f"{self.BASE_URL}/api/user/assign-admin-self",
-            json=payload_refresh_token,
-            headers={
-                "Authorization": f"Bearer {self.access_token}"
-            }
-        )
+    # def assign_admin_self(self):
+    #     payload_refresh_token = {
+    #         "refresh_token": f"{self.refresh_token}"
+    #     }
+    #     self.response = request.post(
+    #         url=f"{self.BASE_URL}/api/user/assign-admin-self",
+    #         json=payload_refresh_token,
+    #         headers={
+    #             "Authorization": f"Bearer {self.access_token}"
+    #         }
+    #     )
+
 
     def delete_user(self):
-        payload_refresh_token = {
-            "refresh_token": f"{self.refresh_token}"
-        }
-        self.response = requests.post(
-            url=f"{self.BASE_URL}/api/user/assign-admin-self",
-            json=payload_refresh_token,
+        self.response = self.request.post(
+            url=f"{self.BASE_URL}/api/user/delete",
             headers={
                 "Authorization": f"Bearer {self.access_token}"
             }
