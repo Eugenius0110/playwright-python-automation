@@ -23,8 +23,43 @@ class Auth(BaseApi):
             'Content-Type': 'application/json; charset=utf-8',
             'Accept': 'application/json; charset=utf-8'
         }
-        self.access_token = None
-        self.refresh_token = None
+        self.__access_token = None
+        self.__refresh_token = None
+
+
+    @allure.step(f"POST request to {URL_LOG}")
+    def login_user(self, payload):
+        self.logger.INFO(f"Login user: {self.URL_LOG}")
+        self.response = self.request.post(
+            url=f"{self.BASE_URL}{self.URL_LOG}",
+            data=payload
+            )
+        if self.response.ok:
+            if 'accessToken' in self.response.json():
+                self.logger.info(f"✅ Login success, tokens received.")
+                self.__access_token = self.response.json()['accessToken']
+                self.__refresh_token = self.response.json()['refreshToken']
+            else:
+                self.logger.WARNING(f" Login success, but no tokens received.")
+            return self.response.json()
+
+        else:
+            self.logger.ERROR(f"❌ Login failed with status code {self.response.status}")
+
+    @allure.step(f"POST request to {URL_LOGOUT}")
+    def logout_user(self):
+        self.logger.info(f"Logout user: {self.URL_LOGOUT}")
+        self.response = self.request.post(
+            url=f"{self.BASE_URL}{self.URL_LOGOUT}",
+            headers={
+                "Authorization": f"Bearer {self.access_token}"
+                }
+            )
+        if self.response.ok:
+            self.logger.info(f"✅ Logout success")
+        else:
+            self.logger.error(f"❌ Logout failed")
+
 
     def signup_user(self, payload): # payload
         self.logger.info(f"Signup user: {self.URL_REG}")
@@ -37,35 +72,7 @@ class Auth(BaseApi):
         #self.logger.info(f"Response body: {self.response.json()}")
         return self.response.json()
 
-    @allure.step(f"POST request to {URL_LOG}")
-    def login_user(self, payload):
-        self.logger.info(f"Login user: {self.URL_LOG}")
-        self.response = self.request.post(
-            url=f"{self.BASE_URL}{self.URL_LOG}",
-            data=payload
-            )
-        if self.response.ok:
-            if 'accessToken' in self.response.json():
-                self.logger.info(f"Login success. Tokens received.")
-                self.access_token = self.response.json()['accessToken']
-                self.refresh_token = self.response.json()['refreshToken']
-            else:
-                self.logger.warning(f"Login success, but no tokens received.")
-            return self.response.json()
 
-        else:
-            self.logger.error(f"Login failed with status code {self.response.status}")
-
-    @allure.step(f"POST request to {URL_LOGOUT}")
-    def logout_user(self):
-        self.logger.info(f"Logout user: {self.URL_LOGOUT}")
-
-        self.response = self.request.post(
-            url=f"{self.BASE_URL}{self.URL_LOGOUT}",
-            headers={
-                "Authorization": f"Bearer {self.access_token}"
-                }
-            )
 
     def confirm_code(self, payload): # payload
         self.logger.info(f"Get confirm_code: /api/auth/registration/confirm-mail")

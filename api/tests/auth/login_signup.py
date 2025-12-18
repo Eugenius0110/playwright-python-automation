@@ -21,47 +21,44 @@ class TestAuthentication:
     @allure.severity(allure.severity_level.BLOCKER)
     @allure.tag("login", "positive")
     @allure.description("""
-    step 1: login user admin
-    step 2: verify status code
-    step 3: verify model
-    step 4: verify access token
-    """)
+        step 1: login user admin
+        step 2: verify status code
+        step 3: verify model
+        step 4: verify access token
+        """)
     @pytest.mark.parametrize('payload, status_code, model', [(
         LoginPayload.payload_user_admin_login_success,
         HTTPStatus.OK,
         models.LoginSuccess200)])
-    def test_login_200(api_request_context, payload, status_code, model): # test_passed
+    def test_login_200(self, api_request_context, payload, status_code, model): # test_passed
         auth = Auth(api_request_context)
         auth.login_user_admin(payload)
         auth.check_response_status_code(status_code)
         auth.check_model(model)
-
 
 
     @allure.title('Logout')
     @allure.severity(allure.severity_level.BLOCKER)
     @allure.tag("logOUT", "positive")
     @allure.description("""
-    step 1: login user admin
-    step 2: verify status code
-    step 3: verify model
-    step 4: verify access token
-    step 5: logout user
-    step 6: verify status code
-    step 7: verify model
-    """)
+        step 1: login user admin
+        step 2: verify status code
+        step 3: verify model
+        step 4: verify access token
+        step 5: logout user
+        step 6: verify status code
+        step 7: verify model
+        """)
     @pytest.mark.parametrize('payload, status_code, model', [(
         LoginPayload.payload_user_admin_login_success,
         HTTPStatus.OK,
         models.LogoutSuccess200)])
-    def test_logout_200(api_request_context, payload, status_code, model): # test_passed
+    def test_logout_200(self, api_request_context, payload, status_code, model): # test_passed
         auth = Auth(api_request_context)
         auth.login_user_admin(payload)
         auth.logout_user()
         auth.check_response_status_code(status_code)
         auth.check_model(model)
-
-
 
 @pytest.mark.skip
 @pytest.mark.api
