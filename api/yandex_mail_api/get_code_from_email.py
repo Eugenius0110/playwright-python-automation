@@ -2,8 +2,11 @@ import os
 import imaplib
 import email
 import time
+import logging
 from email.policy import default
 from dotenv import load_dotenv
+from api.base_api.base_api import BaseApi
+
 import re
 
 load_dotenv()
@@ -13,7 +16,9 @@ IMAP_PORT = int(f"{os.getenv('IMAP_PORT')}")
 IMAP_EMAIL_ACCOUNT = f"{os.getenv('IMAP_MAIL_USER')}"
 IMAP_PASSWORD = f"{os.getenv('IMAP_PASSWORD')}"
 
-class GetConfirmCode:
+class GetConfirmCode():
+
+    #logger = logging.getLogger(__name__)
 
     @staticmethod
     def get_confirm_code_from_latest_email():
@@ -21,14 +26,14 @@ class GetConfirmCode:
         Парсим код из тела письма
         :return:
         """
-        print(f"\n Пауза 20 сек")
-        time.sleep(20)
+        #cls.logger.debug(f"Start get confirm code from email, pause 10 sec???")
+        time.sleep(10)
         mail = imaplib.IMAP4_SSL(IMAP_SERVER, IMAP_PORT)
         status_server, response_server = mail.login(IMAP_EMAIL_ACCOUNT, IMAP_PASSWORD)
-        print(f"Status login: {status_server} {response_server}")
+        #cls.logger.debug(f"Status login: {status_server} {response_server}")
         mail.select('INBOX')
         status_mail, messages = mail.search(None, 'ALL')
-        print(f"Status mail: {status_mail}")
+        #cls.logger.debug(f"Status mail: {status_mail}")
         if status_mail != 'OK' or not messages[0]: #id messages
             return None, "В ящике нет писем"
         email_ids = messages[0].split() # список id писем
@@ -45,7 +50,7 @@ class GetConfirmCode:
         match = re.search(five_digit_pattern, email_body)
         if match:
             confirm_code = match.group(1)
-        print(f"\n ******************** \n Confirm code: {confirm_code} \n ********************")
+        #cls.logger.debug(f"Confirm code: {confirm_code}")
         mail.close()
         mail.logout()
         return confirm_code

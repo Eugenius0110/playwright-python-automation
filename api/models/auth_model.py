@@ -144,11 +144,11 @@ class LoginEmailEmpty400(BaseModel):
 
 
 class LogoutSuccess200(BaseModel):
-    detail: str = Field(min_length=1)
-    @field_validator('detail')
+    message: str = Field(min_length=1)
+    @field_validator('message')
     @classmethod
     def field_data(cls, value: str, data):
-        data = "Вы успешно вышли из аккаунта."
+        data = "Выход выполнен успешно"
         return BaseApi.field_data(value, data)
 
 

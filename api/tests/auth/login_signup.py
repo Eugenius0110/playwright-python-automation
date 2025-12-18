@@ -1,41 +1,86 @@
 
 import pytest
-import json
+import allure
+from http import HTTPStatus
 from api.endpoints.auth import Auth
 #from api.endpoints.confirm_code import ConfirmCode
 #from api.endpoints.set_password import SetPassword
-from api.payloads.auth_payload import SignUpPayload, LoginPayload
+from api.payloads.auth_payload import SignUpPayload, LoginPayload, ConfirmCodePayload
 from api.payloads.auth_payload import ConfirmCodePayload
 from api.payloads.auth_payload import SetPasswordPayload
 import api.models.auth_model as models
-from http import HTTPStatus
 
 
+@pytest.mark.api
+@pytest.mark.smoke
+@allure.feature("Authentication")
+@allure.suite("API tests")
+class TestAuthentication:
+
+    @allure.title("Successful login")
+    @allure.severity(allure.severity_level.BLOCKER)
+    @allure.tag("login", "positive")
+    @allure.description("""
+    step 1: login user admin
+    step 2: verify status code
+    step 3: verify model
+    step 4: verify access token
+    """)
+    @pytest.mark.parametrize('payload, status_code, model', [(
+        LoginPayload.payload_user_admin_login_success,
+        HTTPStatus.OK,
+        models.LoginSuccess200)])
+    def test_login_200(api_request_context, payload, status_code, model): # test_passed
+        auth = Auth(api_request_context)
+        auth.login_user_admin(payload)
+        auth.check_response_status_code(status_code)
+        auth.check_model(model)
+
+
+
+    @allure.title('Logout')
+    @allure.severity(allure.severity_level.BLOCKER)
+    @allure.tag("logOUT", "positive")
+    @allure.description("""
+    step 1: login user admin
+    step 2: verify status code
+    step 3: verify model
+    step 4: verify access token
+    step 5: logout user
+    step 6: verify status code
+    step 7: verify model
+    """)
+    @pytest.mark.parametrize('payload, status_code, model', [(
+        LoginPayload.payload_user_admin_login_success,
+        HTTPStatus.OK,
+        models.LogoutSuccess200)])
+    def test_logout_200(api_request_context, payload, status_code, model): # test_passed
+        auth = Auth(api_request_context)
+        auth.login_user_admin(payload)
+        auth.logout_user()
+        auth.check_response_status_code(status_code)
+        auth.check_model(model)
+
+
+
+@pytest.mark.skip
+@pytest.mark.api
+@pytest.mark.smoke
+@allure.feature("Authentication")
+@allure.story("Sign up")
 @pytest.mark.parametrize('payload, status_code, model', [(
         SignUpPayload.payload_signup_ok,
         HTTPStatus.OK,
         models.SignUpModel200)])
 def test_signup_user_200(api_request_context, payload, status_code, model):
-    signup_endpoint = Auth(api_request_context)
-    signup_endpoint.signup_user(payload)
-    signup_endpoint.check_response_status_code(status_code)
-    signup_endpoint.check_model(model)
-    signup_endpoint.delete_user()
-
-@pytest.mark.parametrize('payload, status_code, model', [(
-        LoginPayload.payload_user_admin_login_success,
-        HTTPStatus.OK,
-        models.LoginSuccess200)])
-@pytest.mark.api
-@pytest.mark.smoke
-def test_login_200(api_request_context, payload, status_code, model): # test_passed
-    login_endpoint = Auth(api_request_context)
-    login_endpoint.login_user_admin(payload)
-    login_endpoint.print_response()
-    login_endpoint.check_response_status_code(status_code)
-    login_endpoint.check_model(model)
-
-
+    auth = Auth(api_request_context)
+    auth.signup_user(payload)
+    auth.check_response_status_code(status_code)
+    auth.check_model(model)
+    auth.confirm_code(ConfirmCodePayload.get_confirm_code())
+    #auth.check_model(model)
+    #signup_endpoint.delete_user()
+    #auth.print_response()
 
 # @pytest.mark.parametrize('payload, status_code, model', [(
 #         ConfirmCodePayload.payload_confirm_code_invalid,

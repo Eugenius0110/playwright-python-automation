@@ -1,11 +1,22 @@
 
-#import requests
-import json
+import os
+import allure
 from playwright.sync_api import APIRequestContext, expect
 from api.base_api.base_api import BaseApi
-
+from api.payloads.auth_payload import ConfirmCodePayload
+from dotenv import load_dotenv
+load_dotenv()
 
 class Auth(BaseApi):
+
+    BASE_URL = f"{os.getenv('HOST_TEAM_2')}"
+    URL_REG = f"{os.getenv('URL_REG')}"
+    URL_LOG = f"{os.getenv('URL_LOGIN')}"
+    URL_LOGOUT = f"{os.getenv('URL_LOGOUT')}"
+
+    TEST_EMAIL_USER = f"{os.getenv('TEST_EMAIL_USER')}."
+
+
     def __init__(self, request_context: APIRequestContext):
         super().__init__(request_context)
         self.header = {
@@ -16,34 +27,80 @@ class Auth(BaseApi):
         self.refresh_token = None
 
     def signup_user(self, payload): # payload
-        self.response = self.request.post(
-            url=f"{self.BASE_URL}/api/auth/registration",
-            headers=self.header,
-            data=payload
-        )
+        self.logger.info(f"Signup user: {self.URL_REG}")
+        with allure.step(f"Request API POST {self.URL_REG}"):
+            self.response = self.request.post(
+                url=f"{self.BASE_URL}{self.URL_REG}",
+                headers=self.header,
+                data=payload
+            )
+        #self.logger.info(f"Response body: {self.response.json()}")
         return self.response.json()
 
-    def login_user_admin(self, payload):
+    @allure.step(f"POST request to {URL_LOG}")
+    def login_user(self, payload):
+        self.logger.info(f"Login user: {self.URL_LOG}")
         self.response = self.request.post(
-            url=f"{self.BASE_URL}/api/auth/login",
+            url=f"{self.BASE_URL}{self.URL_LOG}",
+            data=payload
+            )
+        if self.response.ok:
+            if 'accessToken' in self.response.json():
+                self.logger.info(f"Login success. Tokens received.")
+                self.access_token = self.response.json()['accessToken']
+                self.refresh_token = self.response.json()['refreshToken']
+            else:
+                self.logger.warning(f"Login success, but no tokens received.")
+            return self.response.json()
+
+        else:
+            self.logger.error(f"Login failed with status code {self.response.status}")
+
+    @allure.step(f"POST request to {URL_LOGOUT}")
+    def logout_user(self):
+        self.logger.info(f"Logout user: {self.URL_LOGOUT}")
+
+        self.response = self.request.post(
+            url=f"{self.BASE_URL}{self.URL_LOGOUT}",
+            headers={
+                "Authorization": f"Bearer {self.access_token}"
+                }
+            )
+
+    def confirm_code(self, payload): # payload
+        self.logger.info(f"Get confirm_code: /api/auth/registration/confirm-mail")
+        self.response = self.request.post(
+            url=f"{self.BASE_URL}/api/auth/registration/confirm-mail",
+            headers={
+                "Authorization": f"Bearer {self.access_token}"
+                },
+            data=payload
+        )
+        self.logger.info(f"Confirm_code: {payload}")
+        return self.response.json()
+
+    # def delete_user(self):
+    #     self.response = self.request.post(
+    #         url=f"{self.BASE_URL}/api/user/delete",
+    #         headers={
+    #             "Authorization": f"Bearer {self.access_token}"
+    #         }
+    #     )
+
+
+
+    def login_user_admin(self, payload):
+        self.logger.info(f"Login user: {self.BASE_URL}{self.URL_LOG}")
+        self.response = self.request.post(
+            url=f"{self.BASE_URL}{self.URL_LOG}",
             data=payload
         )
         if 'accessToken' in self.response.json():
+           self.logger.info(f"Login success.")
+           self.logger.info(f"Access token has been received.")
            self.access_token = self.response.json()['accessToken']
            self.refresh_token = self.response.json()['refreshToken']
         return self.response.json()
-
-    # def logout(self):
-    #     payload_refresh_token = {
-    #         "refresh_token": f"{self.refresh_token}"
-    #         }
-    #     self.response = requests.post(
-    #        url=f"{self.BASE_URL}/api/auth/logout",
-    #        json=payload_refresh_token,
-    #        headers={
-    #             "Authorization": f"Bearer {self.access_token}"
-    #             }
-    #         )
 
     # def refresh(self):
     #     payload_refresh_token = {
@@ -69,20 +126,6 @@ class Auth(BaseApi):
     #         }
     #     )
 
-
-    def delete_user(self):
-        self.response = self.request.post(
-            url=f"{self.BASE_URL}/api/user/delete",
-            headers={
-                "Authorization": f"Bearer {self.access_token}"
-            }
-        )
-
-    #
-    # import requests
-    # from api.endpoints.base_api import BaseApi
-    #
-    #
     # class ConfirmCode(BaseApi):
     #
     #     def confirm_code(self, payload):

@@ -42,7 +42,7 @@ class LoginPayload:
         "password": f"{os.getenv('ADMIN_PASSWORD')}"
     }
 
-    payload_create_suser_login_success = {
+    payload_create_user_login_success = {
         "email": f"{os.getenv('TEST_EMAIL_USER')}",
         "password": f"{os.getenv('TEST_PASSWORD')}"
     }
