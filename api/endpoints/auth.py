@@ -57,6 +57,7 @@ class Auth(BaseApi):
             )
         if self.response.ok:
             self.logger.info(f"✅ Logout success")
+            return self.response.json()
         else:
             self.logger.error(f"❌ Logout failed")
 

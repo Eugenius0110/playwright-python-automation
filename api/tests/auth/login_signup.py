@@ -17,7 +17,7 @@ import api.models.auth_model as models
 @allure.suite("API tests")
 class TestAuthentication:
 
-    @allure.title("Successful login")
+    @allure.title("Login")
     @allure.severity(allure.severity_level.BLOCKER)
     @allure.tag("login", "positive")
     @allure.description("""
@@ -39,7 +39,7 @@ class TestAuthentication:
 
     @allure.title('Logout')
     @allure.severity(allure.severity_level.BLOCKER)
-    @allure.tag("logOUT", "positive")
+    @allure.tag("logout", "positive")
     @allure.description("""
         step 1: login user admin
         step 2: verify status code
@@ -63,7 +63,6 @@ class TestAuthentication:
 @pytest.mark.skip
 @pytest.mark.api
 @pytest.mark.smoke
-@allure.feature("Authentication")
 @allure.story("Sign up")
 @pytest.mark.parametrize('payload, status_code, model', [(
         SignUpPayload.payload_signup_ok,

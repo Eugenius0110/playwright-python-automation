@@ -7,6 +7,8 @@ from playwright.sync_api import APIRequestContext
 from api.utils.logger import get_logger
 from http import HTTPStatus
 
+
+
 load_dotenv()
 
 class BaseApi:
@@ -22,9 +24,9 @@ class BaseApi:
         if self.response.status == status_code:
             self.logger.info(f"✅ Status code is valid: {self.response.status}")
             allure.attach(
-                f"Expected: {status_code}\nActual: {self.response.status}\n\"URL: {self.response.url}\n",
+                body=f"Expected: {status_code}\nActual: {self.response.status}\n\"URL: {self.response.url}\n",
                 name="Status code validation",
-                attachment_type=allure.attachment_type.TEXT
+                attachment_type=allure.attachment_type.JSON
             )
             return self
         else:
@@ -35,12 +37,12 @@ class BaseApi:
     def check_model(self, model_class):
         self.logger.info(f"Validate response model: {model_class.__name__}")
         response_json = self.response.json()
-        self.logger.debug(f"Response raw: {json.dumps(response_json, indent=4, ensure_ascii=False)}")
+        #self.logger.debug(f"Response raw: {json.dumps(response_json, indent=4, ensure_ascii=False)}")
         try:
             self.model = model_class(**self.response.json())
             self.logger.info(f"✅ Response model is valid")
             allure.attach(
-                json.dumps(self.model.model_dump(), indent=4, ensure_ascii=False),
+                body=json.dumps(response_json, indent=4, ensure_ascii=False),
                 name="Response model",
                 attachment_type=allure.attachment_type.JSON
             )
