@@ -7,9 +7,8 @@ from playwright.sync_api import APIRequestContext
 from api.utils.logger import get_logger
 from http import HTTPStatus
 
-
-
 load_dotenv()
+
 
 class BaseApi:
 
@@ -42,7 +41,7 @@ class BaseApi:
             self.model = model_class(**self.response.json())
             self.logger.info(f"✅ Response model is valid")
             allure.attach(
-                body=json.dumps(response_json, indent=4, ensure_ascii=False),
+                body=json.dumps(response_json, indent=4, ensure_ascii=False), # self.model.model_dump()
                 name="Response model",
                 attachment_type=allure.attachment_type.JSON
             )
@@ -60,9 +59,9 @@ class BaseApi:
     def field_data(value, data):
         if isinstance(data, str):
             if value != data:
-                raise ValueError(f"❌ Поле не содержит {value}, а содержит {data}")
+                raise ValueError(f'❌ Поле не содержит "{value}", а содержит "{data}"')
         elif isinstance(data, List):
             if value != data:
-                raise ValueError(f"❌ Поле не содержит {value}, а содержит {data}")
+                raise ValueError(f'❌ Поле не содержит "{value}", а содержит "{data}"')
         else:
             raise TypeError(f"❌ Неподдерживаемый тип: {type(value)}")

@@ -148,7 +148,7 @@ class LogoutSuccess200(BaseModel):
     @field_validator('message')
     @classmethod
     def field_data(cls, value: str, data):
-        data = "Выход выполнен успешно"
+        data = "Выход выполнен успешно1"
         return BaseApi.field_data(value, data)
 
 
