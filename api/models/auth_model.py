@@ -6,12 +6,11 @@ from api.base_api.base_api import BaseApi
 
 class SignUpModel200(BaseModel):
     message: str = Field(min_length=1)
-
-    # @field_validator('message')
-    # @classmethod
-    # def field_data(cls, value: str, data):
-    #     data = f"На указанную почту выслан код верификации!"
-    #     return BaseApi.field_data(value, data)
+    @field_validator('message')
+    @classmethod
+    def field_data(cls, actual: str, expected):
+        expected = f"На указанную почту выслан код верификации!"
+        return BaseApi.check_field_data(actual, expected)
 
 
 # class SignUpModelError(BaseModel):
@@ -116,50 +115,50 @@ class LoginSuccess200(BaseModel):
     refreshToken: str = Field(min_length=1)
 
 
-class LoginEmailNotExist400(BaseModel):
-    non_field_errors: List[str] = Field(min_length=1)
-    @field_validator('non_field_errors')
-    @classmethod
-    def field_data(cls, value: str, data):
-        data = ["Неверный email или пароль."]
-        return BaseApi.field_data(value, data)
+# class LoginEmailNotExist400(BaseModel):
+#     non_field_errors: List[str] = Field(min_length=1)
+#     @field_validator('non_field_errors')
+#     @classmethod
+#     def field_data(cls, actual: str, expected):
+#         data = ["Неверный email или пароль."]
+#         return BaseApi.check_field_data(actual, expected)
 
 
-class LoginPasswordIncorrect400(BaseModel):
-    non_field_errors: List[str] = Field(min_length=1)
-    @field_validator('non_field_errors')
-    @classmethod
-    def field_data(cls, value: str, data):
-        data = ["Неверный email или пароль."]
-        return BaseApi.field_data(value, data)
-
-
-class LoginEmailEmpty400(BaseModel):
-    email: List[str] = Field(min_length=1)
-    @field_validator('email')
-    @classmethod
-    def field_data(cls, value: str, data):
-        data = ["Это поле не может быть пустым."]
-        return BaseApi.field_data(value, data)
+# class LoginPasswordIncorrect400(BaseModel):
+#     non_field_errors: List[str] = Field(min_length=1)
+#     @field_validator('non_field_errors')
+#     @classmethod
+#     def field_data(cls, value: str, data):
+#         data = ["Неверный email или пароль."]
+#         return BaseApi.field_data(value, data)
+#
+#
+# class LoginEmailEmpty400(BaseModel):
+#     email: List[str] = Field(min_length=1)
+#     @field_validator('email')
+#     @classmethod
+#     def field_data(cls, value: str, data):
+#         data = ["Это поле не может быть пустым."]
+#         return BaseApi.field_data(value, data)
 
 
 class LogoutSuccess200(BaseModel):
     message: str = Field(min_length=1)
     @field_validator('message')
     @classmethod
-    def field_data(cls, value: str, data):
-        data = "Выход выполнен успешно1"
-        return BaseApi.field_data(value, data)
+    def field_data(cls, actual: str, expected) -> str:
+        expected = "Выход выполнен успешно"
+        return BaseApi.check_field_data(actual, expected)
 
 
-class LogoutError400(BaseModel):
-    detail: str = Field(min_length=1)
-    @field_validator('detail')
-    @classmethod
-    def field_data(cls, value: str, data):
-        data = "Необходим refresh-токен."
-        return BaseApi.field_data(value, data)
+# class LogoutError400(BaseModel):
+#     detail: str = Field(min_length=1)
+#     @field_validator('detail')
+#     @classmethod
+#     def field_data(cls, value: str, data):
+#         data = "Необходим refresh-токен."
+#         return BaseApi.field_data(value, data)
 
 
-class RefreshTokenSuccess200(BaseModel):
-    access_token: str = Field(min_length=1)
+# class RefreshTokenSuccess200(BaseModel):
+#     access_token: str = Field(min_length=1)
